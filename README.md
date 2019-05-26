@@ -1,5 +1,13 @@
 Goal of this repo is to compare provisioning 2-tier web app with CDK and Terraform.
 
+## Todo
+- Diagram
+- Define infra requirements
+- Fix CDK SGs
+- Add Fargate permission to call `s3 ls` on created bucket
+- Terraform infra
+
+
 ## Prerequisites
 
 - AWS CLI
