@@ -4,6 +4,8 @@ import ecs = require('@aws-cdk/aws-ecs');
 import s3 = require('@aws-cdk/aws-s3');
 import rds = require('@aws-cdk/aws-rds');
 import { ContainerImage } from '@aws-cdk/aws-ecs';
+import { PolicyStatement, PolicyStatementEffect } from '@aws-cdk/aws-iam';
+import { Repository } from '@aws-cdk/aws-ecr';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -33,17 +35,16 @@ export class CdkStack extends cdk.Stack {
 
     const dbSubnetGroup = new rds.CfnDBSubnetGroup(this, `DatabaseSubnetGroup`, {
       dbSubnetGroupDescription: 'Database subnet group',
-      subnetIds: vpc.privateSubnets.map((subnet) => subnet.subnetId)
-    })
-
+      subnetIds: vpc.privateSubnets.map((subnet) => subnet.subnetId),
+    });
 
     const database = new rds.CfnDBCluster(this, `DatabaseCluster`, {
-      engineMode: 'serverless',
+      engineMode: 'provisioned',
       engine: 'aurora-postgresql',
       vpcSecurityGroupIds: [dbSg.securityGroupId],
       masterUsername: id,
       masterUserPassword: dbPassword,
-      dbSubnetGroupName: dbSubnetGroup.dbSubnetGroupName
+      dbSubnetGroupName: dbSubnetGroup.dbSubnetGroupName,
     });
 
     // Define ECS Cluster
@@ -55,7 +56,7 @@ export class CdkStack extends cdk.Stack {
       memoryMiB: '512',
       createLogs: true,
       cluster,
-      image: ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
+      image: ContainerImage.fromEcrRepository(Repository.fromRepositoryName(this, 'terraform-vs-cdk', 'terraform-vs-cdk'), 'latest'),
       environment: {
         BUCKET_ARN: bucket.bucketArn,
         DB_ENDPOINT: database.dbClusterEndpointAddress,
@@ -63,6 +64,21 @@ export class CdkStack extends cdk.Stack {
         DB_PASSWORD: dbPassword,
       },
     });
+
+    // Allow connections to the DB from the service SG
+    service.service.connections.securityGroups.forEach((sg) => {
+      dbSg.addIngressRule(sg, new ec2.TcpPort(5432));
+    });
+
+    // Allow Fargate task to manipulate S3 bucket
+    const s3AccessPolicy = new PolicyStatement(
+      PolicyStatementEffect.Allow
+    );
+    s3AccessPolicy.addAction('s3:*');
+    s3AccessPolicy.addResource(bucket.bucketArn);
+
+    // Attach policy
+    service.service.taskDefinition.taskRole.addToPolicy(s3AccessPolicy)
 
     // Define service scaling
     const scaling = service.service.autoScaleTaskCount({

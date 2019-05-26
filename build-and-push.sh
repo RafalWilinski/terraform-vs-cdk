@@ -19,15 +19,15 @@ if ! [ -x "$(command -v docker)" ]; then
   exit 1
 fi
 
-repositoryUri=$(aws ecr describe-repositories --region us-west-2| jq -r '.repositories[] | select(.repositoryName=="terraform-vs-cdk") | .repositoryUri')
+repositoryUri=$(aws ecr describe-repositories --region us-east-1 | jq -r '.repositories[] | select(.repositoryName=="terraform-vs-cdk") | .repositoryUri')
 if [ -n "$repositoryUri" ]; then
   echo "Repository found, no need to create one."
 else
   echo "Could not find terraform-vs-cdk ECR, creating..."
-  repositoryUri=$(aws ecr create-repository --repository-name "terraform-vs-cdk" --region us-west-2 | jq -r .repository.repositoryUri)
+  repositoryUri=$(aws ecr create-repository --repository-name "terraform-vs-cdk" --region us-east-1 | jq -r .repository.repositoryUri)
 fi
 
-$(aws ecr get-login --no-include-email --region us-west-2)
+$(aws ecr get-login --no-include-email --region us-east-1)
 
 docker build -t terraform-vs-cdk .
 docker tag terraform-vs-cdk:latest "${repositoryUri}:latest"

@@ -1,12 +1,24 @@
-Goal of this repo is to compare provisioning 2-tier web app with CDK and Terraform.
+# Terraform vs AWS CDK - Comparison by building 2-tier Web Application 
+
+Goal of this repo is to compare provisioning of 2-tier web app with CDK and Terraform.
 
 ## Todo
-- Diagram
-- Define infra requirements
-- Fix CDK SGs
-- Add Fargate permission to call `s3 ls` on created bucket
 - Terraform infra
 
+## Intro
+
+What we'll be building:
+![Infra](assets/infra.png?raw=true "Infra")
+
+Key points:
+- VPC with two subnets (public and private) in each AZ, IPGW in Public, NAT Gateway in private
+- ECS Cluster in Public Subnet running Fargate cluster with Node.js service and task
+- Application Load Balancer exposed to the public connected to the Fargate service
+- Public S3 bucket with assets
+- IAM Role for task to manipulate S3 Bucket
+- Serverless RDS Aurora MySQL-compatible instance in private subnet, accessible only from ECS tasks
+
+For this comparison's sake we'll need a Docker image with a simple Express.js stored in ECR. Simply execute `./build-and-push.sh` to create an AWS Elastic Container Registry, build the Docker image and push it to the cloud.
 
 ## Prerequisites
 
@@ -14,10 +26,6 @@ Goal of this repo is to compare provisioning 2-tier web app with CDK and Terrafo
 - AWS CDK
 - Docker
 - Terraform
-
-## Intro
-
-For this comparison's sake we'll need a Docker image with a simple Express.js stored in ECR. Simply execute `build-and-push.sh` to create an AWS Elastic Container Registry, build the Docker image and push it to the cloud.
 
 ## CDK
 
