@@ -38,6 +38,14 @@ export class CdkStack extends cdk.Stack {
       subnetIds: vpc.privateSubnets.map((subnet) => subnet.subnetId),
     });
 
+    const parameterGroup = new rds.CfnDBClusterParameterGroup(this, 'DBParamGroup', {
+      family: 'aurora-postgresql9.6',
+      description: 'Database parameter group',
+      parameters: {
+        "rds.force_ssl": "1"
+      },
+    });
+
     const database = new rds.CfnDBCluster(this, `DatabaseCluster`, {
       engineMode: 'provisioned',
       engine: 'aurora-postgresql',
@@ -45,6 +53,7 @@ export class CdkStack extends cdk.Stack {
       masterUsername: id,
       masterUserPassword: dbPassword,
       dbSubnetGroupName: dbSubnetGroup.dbSubnetGroupName,
+      dbClusterParameterGroupName: parameterGroup.dbClusterParameterGroupName,
     });
 
     // Define ECS Cluster
@@ -52,7 +61,7 @@ export class CdkStack extends cdk.Stack {
 
     // Define ECS Service using Fargate with CloudWatch logs and LoadBalancer
     const service = new ecs.LoadBalancedFargateService(this, `Service`, {
-      cpu: '512',
+      cpu: '256',
       memoryMiB: '512',
       createLogs: true,
       cluster,
