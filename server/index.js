@@ -13,20 +13,20 @@ const port = 3000;
 
 app.get('/', (req, res) => {
   client.connect();
-  client.query('SELECT * FROM pg_catalog.pg_tables;', (err, data) => {
+  client.query('SELECT * FROM pg_catalog.pg_tables;', async (err, data) => {
     if (err) {
       res.statusCode(400);
-      return res.send(err)
+      return res.send(err);
     }
     client.end();
 
     const listObjects = await s3.listObjectsV2({
       Bucket: process.env.ASSETS_BUCKET,
-    }).promise()
+    }).promise();
 
     res.send({
       data,
-      listObjects
+      listObjects,
     });
   });
 })
