@@ -26,8 +26,6 @@ export class CdkStack extends cdk.Stack {
       description: 'Allows connection on port 5432 from Public VPC SG',
     });
 
-    // dbSg.addIngressRule(vpc.publicSubnets[0], new ec2.TcpPort(5432), '', true);
-
     // Define bucket for assets
     const bucket = new s3.Bucket(this, `AssetsBucket`, {
       publicReadAccess: true,
@@ -38,22 +36,15 @@ export class CdkStack extends cdk.Stack {
       subnetIds: vpc.privateSubnets.map((subnet) => subnet.subnetId),
     });
 
-    const parameterGroup = new rds.CfnDBClusterParameterGroup(this, 'DBParamGroup', {
-      family: 'aurora-postgresql9.6',
-      description: 'Database parameter group',
-      parameters: {
-        "rds.force_ssl": "1"
-      },
-    });
-
-    const database = new rds.CfnDBCluster(this, `DatabaseCluster`, {
-      engineMode: 'provisioned',
-      engine: 'aurora-postgresql',
-      vpcSecurityGroupIds: [dbSg.securityGroupId],
+    const database = new rds.CfnDBInstance(this, `Database`, {
+      engine: 'postgres',
+      engineVersion: '10.6',
+      dbInstanceClass: 'db.t2.micro',
+      vpcSecurityGroups: [dbSg.securityGroupId],
       masterUsername: id,
       masterUserPassword: dbPassword,
       dbSubnetGroupName: dbSubnetGroup.dbSubnetGroupName,
-      dbClusterParameterGroupName: parameterGroup.dbClusterParameterGroupName,
+      allocatedStorage: '10',
     });
 
     // Define ECS Cluster
@@ -68,10 +59,11 @@ export class CdkStack extends cdk.Stack {
       image: ContainerImage.fromEcrRepository(Repository.fromRepositoryName(this, 'terraform-vs-cdk', 'terraform-vs-cdk'), 'latest'),
       environment: {
         BUCKET_ARN: bucket.bucketArn,
-        DB_ENDPOINT: database.dbClusterEndpointAddress,
+        DB_ENDPOINT: database.dbInstanceEndpointAddress,
         DB_USERNAME: id,
         DB_PASSWORD: dbPassword,
       },
+      containerPort: 3000,
     });
 
     // Allow connections to the DB from the service SG
