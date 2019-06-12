@@ -4,6 +4,10 @@ resource "aws_vpc" "main" {
   cidr_block = "20.0.0.0/16"
 }
 
+resource "aws_internet_gateway" "gw" {
+  vpc_id = "${aws_vpc.main.id}"
+}
+
 # Create var.az_count private subnets, each in a different AZ
 resource "aws_subnet" "private" {
   count             = "${var.az_count}"
@@ -41,7 +45,7 @@ resource "aws_route_table" "private" {
   vpc_id = "${aws_vpc.main.id}"
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = "${element(aws_nat_gateway.gw.*.id, count.index)}"
   }
 }
