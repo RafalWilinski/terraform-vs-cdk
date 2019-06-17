@@ -33,7 +33,7 @@ export class CdkStack extends cdk.Stack {
 
     const dbSubnetGroup = new rds.CfnDBSubnetGroup(this, `DatabaseSubnetGroup`, {
       dbSubnetGroupDescription: 'Database subnet group',
-      subnetIds: vpc.privateSubnets.map((subnet) => subnet.subnetId),
+      subnetIds: vpc.privateSubnets.map(subnet => subnet.subnetId),
     });
 
     const database = new rds.CfnDBInstance(this, `Database`, {
@@ -56,7 +56,10 @@ export class CdkStack extends cdk.Stack {
       memoryMiB: '512',
       createLogs: true,
       cluster,
-      image: ContainerImage.fromEcrRepository(Repository.fromRepositoryName(this, 'terraform-vs-cdk', 'terraform-vs-cdk'), 'latest'),
+      image: ContainerImage.fromEcrRepository(
+        Repository.fromRepositoryName(this, 'terraform-vs-cdk', 'terraform-vs-cdk'),
+        'latest',
+      ),
       environment: {
         BUCKET_ARN: bucket.bucketArn,
         DB_ENDPOINT: database.dbInstanceEndpointAddress,
@@ -67,19 +70,17 @@ export class CdkStack extends cdk.Stack {
     });
 
     // Allow connections to the DB from the service SG
-    service.service.connections.securityGroups.forEach((sg) => {
+    service.service.connections.securityGroups.forEach(sg => {
       dbSg.addIngressRule(sg, new ec2.TcpPort(5432));
     });
 
     // Allow Fargate task to manipulate S3 bucket
-    const s3AccessPolicy = new PolicyStatement(
-      PolicyStatementEffect.Allow
-    );
+    const s3AccessPolicy = new PolicyStatement(PolicyStatementEffect.Allow);
     s3AccessPolicy.addAction('s3:*');
     s3AccessPolicy.addResource(bucket.bucketArn);
 
     // Attach policy
-    service.service.taskDefinition.taskRole.addToPolicy(s3AccessPolicy)
+    service.service.taskDefinition.taskRole.addToPolicy(s3AccessPolicy);
 
     // Define service scaling
     const scaling = service.service.autoScaleTaskCount({
