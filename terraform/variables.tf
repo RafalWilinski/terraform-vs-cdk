@@ -3,7 +3,7 @@ variable "az_count" {
 }
 
 variable "name" {
-  default = "TerraformStack"
+  default = "terraform-stack"
 }
 
 variable "app_port" {
@@ -11,7 +11,7 @@ variable "app_port" {
 }
 
 variable "fargate_cpu" {
-  default = "512"
+  default = "256"
 }
 
 variable "fargate_memory" {

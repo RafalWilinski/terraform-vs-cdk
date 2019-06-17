@@ -59,7 +59,7 @@ resource "aws_security_group" "ecs_tasks" {
   ingress {
     from_port   = 49153
     to_port     = 65535
-    protocol    = "-1"
+    protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
