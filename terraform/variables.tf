@@ -19,7 +19,7 @@ variable "fargate_memory" {
 }
 
 variable "app_image" {
-  default = "terraform-vs-cdk:latest"
+  default = "085108115628.dkr.ecr.us-east-1.amazonaws.com/terraform-vs-cdk:latest"
 }
 
 variable "app_count" {
