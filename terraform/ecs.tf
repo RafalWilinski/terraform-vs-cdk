@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "app" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "${var.fargate_cpu}"
   memory                   = "${var.fargate_memory}"
-  execution_role_arn       = "${aws_iam_policy.ecs_execution_policy.arn}"
+  execution_role_arn       = "${aws_iam_role.ecs_task_execution_role.arn}"
 
   container_definitions = <<DEFINITION
 [
