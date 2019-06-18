@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "ecs_execution_policy" {
-  name        = "${var.name}-ecs_execution_policy"
+  name        = "${var.name}-ecs-execution-policy"
   path        = "/"
   description = "${var.name} ECS Task Execution Policy"
 
@@ -24,8 +24,29 @@ resource "aws_iam_policy" "ecs_execution_policy" {
 EOF
 }
 
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.name}-ecs-task-exec-role"
+resource "aws_iam_policy" "ecs_task_policy" {
+  name        = "${var.name}-ecs-task-policy"
+  path        = "/"
+  description = "${var.name} ECS Task Policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+         "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "ecs_execution_role" {
+  name = "${var.name}-ecs-exec-role"
 
   assume_role_policy = <<EOF
 {
@@ -45,7 +66,32 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "ecs-attachment" {
-    role       = "${aws_iam_role.ecs_task_execution_role.name}"
+resource "aws_iam_role_policy_attachment" "ecs_exec_attachment" {
+    role       = "${aws_iam_role.ecs_execution_role.name}"
     policy_arn = "${aws_iam_policy.ecs_execution_policy.arn}"
+}
+
+resource "aws_iam_role" "ecs_task_role" {
+  name = "${var.name}-ecs-task-role"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+            "Service": [
+                "ecs-tasks.amazonaws.com"
+            ]
+            },
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+resource "aws_iam_role_policy_attachment" "ecs_task_attachment" {
+    role       = "${aws_iam_role.ecs_task_role.name}"
+    policy_arn = "${aws_iam_policy.ecs_task_policy.arn}"
 }
