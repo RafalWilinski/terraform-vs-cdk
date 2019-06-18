@@ -33,7 +33,7 @@ resource "aws_ecs_task_definition" "app" {
       "value": "${aws_db_instance.default.endpoint}"
     }, {
       "name": "DB_USERNAME",
-      "value": "${var.name}"
+      "value": "terraformdb"
     }, {
       "name": "DB_PASSWORD",
       "value": "${random_string.password.result}"

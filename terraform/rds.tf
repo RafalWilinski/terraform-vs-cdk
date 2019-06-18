@@ -9,8 +9,8 @@ resource "aws_db_instance" "default" {
   engine               = "postgres"
   engine_version       = "10.6"
   instance_class       = "db.t2.micro"
-  name                 = "Database"
-  username             = "${var.name}"
+  name                 = "terraformdb"
+  username             = "terraformdb"
   password             = "${random_string.password.result}"
   parameter_group_name = "default.postgres5.7"
 }
