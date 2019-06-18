@@ -42,6 +42,7 @@ export class CdkStack extends cdk.Stack {
       dbInstanceClass: 'db.t2.micro',
       vpcSecurityGroups: [dbSg.securityGroupId],
       masterUsername: id,
+      dbName: id,
       masterUserPassword: dbPassword,
       dbSubnetGroupName: dbSubnetGroup.dbSubnetGroupName,
       allocatedStorage: '10',
@@ -65,6 +66,7 @@ export class CdkStack extends cdk.Stack {
         DB_ENDPOINT: database.dbInstanceEndpointAddress,
         DB_USERNAME: id,
         DB_PASSWORD: dbPassword,
+        DB_NAME: database.dbInstanceId,
       },
       containerPort: 3000,
     });

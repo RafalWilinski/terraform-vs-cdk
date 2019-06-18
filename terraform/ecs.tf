@@ -37,6 +37,9 @@ resource "aws_ecs_task_definition" "app" {
     }, {
       "name": "DB_PASSWORD",
       "value": "${random_string.password.result}"
+    }, {
+      "name": "DB_NAME",
+      "value": "terraformdb"
     }],
     "logConfiguration": {
       "logDriver": "awslogs",

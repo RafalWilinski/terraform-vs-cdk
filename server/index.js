@@ -6,6 +6,7 @@ const pool = new Pool({
   port: 5432,
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 const app = express();
 const s3 = new S3();
