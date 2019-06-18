@@ -9,6 +9,7 @@ resource "aws_ecs_task_definition" "app" {
   cpu                      = "${var.fargate_cpu}"
   memory                   = "${var.fargate_memory}"
   execution_role_arn       = "${aws_iam_role.ecs_task_execution_role.arn}"
+  task_role_arn = 
 
   container_definitions = <<DEFINITION
 [
@@ -23,7 +24,20 @@ resource "aws_ecs_task_definition" "app" {
         "containerPort": ${var.app_port},
         "hostPort": ${var.app_port}
       }
-    ]
+    ],
+    "environment":[{
+      "name": "BUCKET_ARN",
+      "value": "${aws_s3_bucket.assets-bucket.arn}"
+    }, {
+      "name": "DB_ENDPOINT",
+      "value": "${aws_db_instance.default.endpoint}"
+    }, {
+      "name": "DB_USERNAME",
+      "value": "${var.name}"
+    }, {
+      "name": "DB_PASSWORD",
+      "value": "${random_string.password.result}"
+    }]
   }
 ]
 DEFINITION
