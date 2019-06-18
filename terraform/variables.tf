@@ -1,3 +1,7 @@
+variable "region" {
+  default = "us-east-1"
+}
+
 variable "az_count" {
   default = "2"
 }

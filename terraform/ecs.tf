@@ -8,8 +8,8 @@ resource "aws_ecs_task_definition" "app" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "${var.fargate_cpu}"
   memory                   = "${var.fargate_memory}"
-  execution_role_arn       = "${aws_iam_role.ecs_task_execution_role.arn}"
-  task_role_arn = 
+  execution_role_arn       = "${aws_iam_role.ecs_execution_role.arn}"
+  task_role_arn            = "${aws_iam_role.ecs_task_role.arn}"
 
   container_definitions = <<DEFINITION
 [
@@ -37,7 +37,14 @@ resource "aws_ecs_task_definition" "app" {
     }, {
       "name": "DB_PASSWORD",
       "value": "${random_string.password.result}"
-    }]
+    }],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${var.name}",
+        "awslogs-region": "${var.region}",
+      }
+    }
   }
 ]
 DEFINITION
