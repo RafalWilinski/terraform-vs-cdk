@@ -1,16 +1,18 @@
-# Terraform vs AWS CDK - Comparison by building 2-tier Web Application 
+# Terraform vs AWS CDK - Comparison by building 2-tier Web Application
 
 Goal of this repo is to compare provisioning of 2-tier web app with CDK and Terraform.
 
 ## Todo
+
 - Terraform infra
 
 ## Intro
 
 What we'll be building:
-![Infra](assets/infra.png?raw=true "Infra")
+![Infra](assets/infra.svg?sanitize=true 'Infra')
 
 Key points:
+
 - VPC with two subnets (public and private) in each AZ, IPGW in Public, NAT Gateway in private
 - ECS Cluster in Public Subnet running Fargate cluster with Node.js service and task
 - Application Load Balancer exposed to the public connected to the Fargate service
@@ -39,21 +41,25 @@ For this comparison's sake we'll need a Docker image with a simple Express.js st
 - With higher level of abstraction you end up having more circular dependencies, e.g. ECS Service wants Database URL but database's SG needs to know from which SG it should allow the traffic
 
 #### Initialization
+
 ```sh
 cdk init app --language=typescript
 ```
 
 We'll need ECS, EC2, S3 and RDS packages:
+
 ```
 npm i @aws-cdk/aws-ecs @aws-cdk/aws-ec2 @aws-cdk/aws-s3 @aws-cdk/aws-rds
 ```
 
 To render CloudFormation file:
+
 ```sh
 npm run build && cdk synth
 ```
 
 To deploy
+
 ```sh
 cdk deploy
 ```

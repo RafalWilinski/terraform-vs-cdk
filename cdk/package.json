@@ -8,7 +8,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "cdk": "cdk",
-    "deploy": "npm run build && AWS_REGION=us-east-1 cdk deploy"
+    "deploy": "npm run build && AWS_REGION=us-east-1 cdk deploy",
+    "destroy": "AWS_REGION=us-east-1 cdk destroy"
   },
   "devDependencies": {
     "@types/node": "8.10.45",
