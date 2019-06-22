@@ -62,7 +62,7 @@ export class CdkStack extends cdk.Stack {
         'latest',
       ),
       environment: {
-        BUCKET_ARN: bucket.bucketArn,
+        ASSETS_BUCKET: bucket.bucketName,
         DB_ENDPOINT: database.dbInstanceEndpointAddress,
         DB_USERNAME: id,
         DB_PASSWORD: dbPassword,
