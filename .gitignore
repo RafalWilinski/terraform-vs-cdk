@@ -1,3 +1,4 @@
 node_modules
 cdk/cdk.out
 terraform/terraform.tfstate
+.DS_Store

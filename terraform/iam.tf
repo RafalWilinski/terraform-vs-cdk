@@ -67,8 +67,8 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_exec_attachment" {
-    role       = "${aws_iam_role.ecs_execution_role.name}"
-    policy_arn = "${aws_iam_policy.ecs_execution_policy.arn}"
+    role       = aws_iam_role.ecs_execution_role.name
+    policy_arn = aws_iam_policy.ecs_execution_policy.arn
 }
 
 resource "aws_iam_role" "ecs_task_role" {
@@ -92,6 +92,6 @@ resource "aws_iam_role" "ecs_task_role" {
 EOF
 }
 resource "aws_iam_role_policy_attachment" "ecs_task_attachment" {
-    role       = "${aws_iam_role.ecs_task_role.name}"
-    policy_arn = "${aws_iam_policy.ecs_task_policy.arn}"
+    role       = aws_iam_role.ecs_task_role.name
+    policy_arn = aws_iam_policy.ecs_task_policy.arn
 }

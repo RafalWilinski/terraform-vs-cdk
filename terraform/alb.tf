@@ -4,7 +4,7 @@
 resource "aws_security_group" "lb" {
   name        = "${var.name}-ALB-SG"
   description = "controls access to the ALB"
-  vpc_id      = "${aws_vpc.main.id}"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     protocol    = "tcp"
@@ -30,25 +30,28 @@ resource "aws_security_group" "lb" {
 
 resource "aws_alb" "main" {
   name            = "${var.name}-ALB"
-  subnets         = ["${aws_subnet.public.*.id}"]
-  security_groups = ["${aws_security_group.lb.id}"]
+  subnets         = [
+    for subnet in aws_subnet.private:
+    subnet.id
+  ]
+  security_groups = [aws_security_group.lb.id]
 }
 
 resource "aws_alb_target_group" "app" {
   name        = "${var.name}-TG"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = "${aws_vpc.main.id}"
+  vpc_id      = aws_vpc.main.id
   target_type = "ip"
 }
 
 resource "aws_alb_listener" "app" {
-  load_balancer_arn = "${aws_alb.main.id}"
+  load_balancer_arn = aws_alb.main.id
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = "${aws_alb_target_group.app.id}"
+    target_group_arn = aws_alb_target_group.app.id
     type             = "forward"
   }
 }
