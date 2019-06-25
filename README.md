@@ -67,3 +67,10 @@ cdk deploy
 ## Terraform
 
 ...
+
+```sh
+➜  find ./cdk/lib -name "*.ts" | xargs cat | wc -l
+105
+➜  find ./terraform -name "*.tf" | xargs cat | wc -l
+516
+```
