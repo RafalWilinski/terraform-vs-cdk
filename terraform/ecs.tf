@@ -14,15 +14,15 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = <<DEFINITION
 [
   {
-    "cpu": "${var.fargate_cpu}",
+    "cpu": ${var.fargate_cpu},
     "image": "${var.app_image}",
-    "memory": "${var.fargate_memory}",
+    "memory": ${var.fargate_memory},
     "name": "app",
     "networkMode": "awsvpc",
     "portMappings": [
       {
-        "containerPort": "${var.app_port}",
-        "hostPort": "${var.app_port}"
+        "containerPort": ${var.app_port},
+        "hostPort": ${var.app_port}
       }
     ],
     "environment":[{
@@ -44,8 +44,9 @@ resource "aws_ecs_task_definition" "app" {
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "${var.name}",
-        "awslogs-region": "${var.region}"
+        "awslogs-group": "${aws_cloudwatch_log_group.task_logs.name}",
+        "awslogs-region": "${var.region}",
+        "awslogs-stream-prefix": "${aws_cloudwatch_log_stream.task_stream.name}"
       }
     }
   }
@@ -86,10 +87,17 @@ resource "aws_security_group" "ecs_tasks" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "TCP"
+    security_groups = [aws_security_group.lb.id]
+  }
+
+  ingress {
     from_port   = 49153
     to_port     = 65535
     protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.lb.id]
   }
 
   egress {
