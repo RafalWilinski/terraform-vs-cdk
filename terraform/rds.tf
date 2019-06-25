@@ -1,12 +1,12 @@
 resource "random_string" "password" {
-  length = 16
+  length  = 16
   special = false
 }
 
 resource "aws_db_subnet_group" "default" {
-  name       = "dbsubnetgroup"
+  name = "dbsubnetgroup"
   subnet_ids = [
-    for subnet in aws_subnet.private:
+    for subnet in aws_subnet.private :
     subnet.id
   ]
 

@@ -29,9 +29,9 @@ resource "aws_security_group" "lb" {
 }
 
 resource "aws_alb" "main" {
-  name            = "${var.name}-ALB"
-  subnets         = [
-    for subnet in aws_subnet.private:
+  name = "${var.name}-ALB"
+  subnets = [
+    for subnet in aws_subnet.private :
     subnet.id
   ]
   security_groups = [aws_security_group.lb.id]

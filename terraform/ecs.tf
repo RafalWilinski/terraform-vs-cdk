@@ -30,7 +30,7 @@ resource "aws_ecs_task_definition" "app" {
       "value": "${aws_s3_bucket.assets-bucket.bucket}"
     }, {
       "name": "DB_ENDPOINT",
-      "value": "${aws_db_instance.default.endpoint}"
+      "value": "${aws_db_instance.default.address}"
     }, {
       "name": "DB_USERNAME",
       "value": "terraformdb"
@@ -55,24 +55,24 @@ DEFINITION
 }
 
 resource "aws_ecs_service" "main" {
-  name            = "${var.name}-service"
-  cluster         = aws_ecs_cluster.main.id
+  name = "${var.name}-service"
+  cluster = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = var.app_count
-  launch_type     = "FARGATE"
+  desired_count = var.app_count
+  launch_type = "FARGATE"
 
   network_configuration {
     security_groups = [aws_security_group.ecs_tasks.id]
-    subnets  = [
-      for subnet in aws_subnet.private:
+    subnets = [
+      for subnet in aws_subnet.private :
       subnet.id
     ]
   }
 
   load_balancer {
     target_group_arn = aws_alb_target_group.app.id
-    container_name   = "app"
-    container_port   = var.app_port
+    container_name = "app"
+    container_port = var.app_port
   }
 
   depends_on = [
@@ -82,28 +82,28 @@ resource "aws_ecs_service" "main" {
 }
 
 resource "aws_security_group" "ecs_tasks" {
-  name        = "ecs_tasks"
+  name = "ecs_tasks"
   description = "Allow traffic from the internet"
-  vpc_id      = aws_vpc.main.id
+  vpc_id = aws_vpc.main.id
 
   ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "TCP"
+    from_port = 3000
+    to_port = 3000
+    protocol = "TCP"
     security_groups = [aws_security_group.lb.id]
   }
 
   ingress {
-    from_port   = 49153
-    to_port     = 65535
-    protocol    = "TCP"
+    from_port = 49153
+    to_port = 65535
+    protocol = "TCP"
     security_groups = [aws_security_group.lb.id]
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
