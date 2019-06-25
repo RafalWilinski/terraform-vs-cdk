@@ -15,12 +15,9 @@ const port = 3000;
 app.get('/', async (req, res) => {
   try {
     const data = await pool.query('SELECT * FROM pg_catalog.pg_tables;');
-    console.log(data);
-
     const listObjects = await s3.listObjectsV2({
       Bucket: process.env.ASSETS_BUCKET,
     }).promise();
-    console.log(listObjects);
 
     res.status(200);
     res.send({
@@ -31,7 +28,7 @@ app.get('/', async (req, res) => {
     console.log(err);
 
     res.status(400);
-    return res.send(err);
+    return res.send({err: JSON.stringify(err)});
   }
 })
 
