@@ -1,6 +1,6 @@
 # Terraform vs AWS CDK - Comparison by building 2-tier Web Application
 
-Source code for article: [https://servicefull.cloud/blog/terraform-vs-cdk](https://servicefull.cloud/blog/terraform-vs-cdk)
+Source code for article: [https://servicefull.cloud/blog/cdk-vs-terraform/](https://servicefull.cloud/blog/cdk-vs-terraform/)
 
 Goal of this repo is to compare provisioning of 2-tier web app with CDK and Terraform.
 
